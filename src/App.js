@@ -6,15 +6,17 @@ import About from "./components/About";
 import Footer from "./components/Footer";
 
 function App() {
-  const [theme, setTheme] = useState(null);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-      setTheme("dark");
+  const [theme, setTheme] = useState(() => {
+    // Check if there's a theme preference stored in localStorage
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme) {
+      return storedTheme;
+    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
     } else {
-      setTheme("light");
+      return "light";
     }
-  }, []);
+  });
 
   useEffect(() => {
     if (theme === "light") {
@@ -25,7 +27,10 @@ function App() {
   }, [theme]);
 
   const handleThemeSwitch = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    // Toggle between "light" and "dark" themes and save in localStorage
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
   return (
@@ -37,7 +42,11 @@ function App() {
       >
         {theme === "dark" ? "🌙" : "☀️"}
       </button>
-      <div className="font-inter bg:white dark:bg-slate-900">
+      <div
+        className={`font-inter ${
+          theme === "dark" ? "dark" : ""
+        } bg-white dark:bg-slate-900`}
+      >
         <div className="max-w-5xl mx-auto w-11/12">
           <HeroSection />
           <Services />
